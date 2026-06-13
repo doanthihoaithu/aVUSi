@@ -250,6 +250,38 @@ pip install -r requirements.txt
 
 ---
 
+## Repository Structure
+
+```
+aVUSi/
+├── 1_synthetic_data_generator/   # Module 1: generate synthetic MTS with dimension-wise anomaly labels
+│   └── README.md
+├── 2_anomaly_detector/           # Module 2: run interpretable detectors, produce S and DCM
+│   └── README.md
+├── 3_metric_calculator/          # Module 3: compute VUS-PR, IndepNDCG, and aVUSi
+│   └── README.md
+├── conf/                         # Configuration files
+│   ├── config.yaml
+│   └── config.yaml.example
+├── data/                         # Input datasets (Synthetic, SMD)
+├── figures/                      # Paper figures
+│   ├── avusi-motivation.png      # Figure 1: motivation for aVUSi
+│   └── avusi-alg.png             # Figure 2: aVUSi algorithm illustration
+├── notebooks/                    # Jupyter notebooks for analysis and visualization
+├── output/                       # Detector outputs and evaluation results
+├── requirements.txt
+└── README.md
+```
+
+The three numbered modules form a sequential pipeline:
+
+```
+1_synthetic_data_generator  →  2_anomaly_detector  →  3_metric_calculator
+       (X, L, DL)               (S, DCM)              (VUS-PR, IndepNDCG, aVUSi)
+```
+
+---
+
 ## Usage
 
 ```python
