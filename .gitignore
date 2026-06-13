@@ -3,3 +3,6 @@
 
 data
 config/config.yaml
+
+hydra_outputs
+**/__pycache__/

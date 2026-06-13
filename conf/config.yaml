@@ -1,0 +1,52 @@
+hydra:
+  run:
+    dir: ./hydra_outputs
+
+random_state: 42
+
+mts_supported_detectors: ['cblof', 'auto_encoder', 'copod', 'denoising_auto_encoder', 'encdec_ad',
+                          'hbos', 'omni_anomaly', 'random_black_forest', 'tran_ad' , 'mtad_gat']
+
+datasets:
+  settings_six:
+    n_sensors: 10
+  smd:
+    n_sensors: 38
+
+demo_config:
+  dataset: settings_six
+  time_series_id: 'synthetic_batch_999'
+  detector: cblof
+
+parameter_sensitivity_analysis:
+  datasets:
+    settings_six:
+      max_k: ${datasets.settings_six.n_sensors}
+      max_smoothing_window: 10
+      max_n_interpretability_sensitivity_levels: 50
+      k_slide: 1
+      smoothing_window_slide: 1
+      n_interpretability_sensitivity_levels_slide: 10
+      fix_k: False
+      fix_smoothing_window: True
+      fix_n_interpretability_sensitivity_levels: True
+      default_selected_k: 5
+      default_selected_smoothing_window: 10
+      default_selected_n_interpretability_sensitivity_levels: 50
+      vus_slope: 64
+      vus_n_thresholds: 250
+    smd:
+      max_k: ${datasets.smd.n_sensors}
+      max_smoothing_window: 10
+      max_n_interpretability_sensitivity_levels: 50
+      k_slide: 2
+      smoothing_window_slide: 1
+      n_interpretability_sensitivity_levels_slide: 10
+      fix_k: True
+      fix_smoothing_window: True
+      fix_n_interpretability_sensitivity_levels: False
+      default_selected_k: 10
+      default_selected_smoothing_window: 10
+      default_selected_n_interpretability_sensitivity_levels: 50
+      vus_slope: 64
+      vus_n_thresholds: 250
