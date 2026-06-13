@@ -28,7 +28,7 @@ aVUSi addresses this gap by providing a **unified, threshold-independent** measu
 
 ---
 
-## Method
+## Illustration of aVUSi
 
 ![Algorithm](figures/avusi-alg.png)
 
@@ -61,7 +61,7 @@ $$\text{VUSi}^m = \text{VUS-PR}(PS^m)$$
 ### Step 5 — Aggregate to obtain aVUSi
 aVUSi is the area under the VUSi(m) curve as m sweeps from 0 to 1:
 
-$$\text{aVUSi}(X) = \int_0^1 \text{VUSi}^m \, dm \approx \frac{1}{M} \sum_{i=0}^{M-1} \text{VUSi}^{m_i}$$
+$$\text{aVUSi}(X) = \int_0^1 \text{VUSi}^m dm \approx \frac{1}{M} \sum_{i=0}^{M-1} \text{VUSi}^{m_i}$$
 
 ---
 
