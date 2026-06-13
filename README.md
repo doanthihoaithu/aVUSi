@@ -16,6 +16,8 @@ aVUSi builds upon **VUS-PR** — a threshold-independent, range-based accuracy m
 
 ## Motivation
 
+![Motivation](figures/avusi-motivation.png)
+
 Existing anomaly detection benchmarks primarily focus on detection accuracy and treat interpretability as a separate post-hoc analysis. This disconnect makes it difficult to systematically compare detectors that trade one aspect against the other. For example:
 
 - A detector may achieve strong detection accuracy while **completely failing** to identify which dimensions caused the anomaly (e.g., DAE: VUS-PR = 0.85, IndepNDCG = 0.00).
@@ -27,6 +29,8 @@ aVUSi addresses this gap by providing a **unified, threshold-independent** measu
 ---
 
 ## Method
+
+![Algorithm](figures/avusi-alg.png)
 
 aVUSi proceeds in five steps (see Algorithm 1 in the paper):
 
@@ -49,15 +53,15 @@ For each sensitivity level m ∈ [0, 1], construct the penalized anomaly score s
 
 $$PS^m = S \odot S^m_{\text{Interp}}, \quad \text{where} \quad S^m_{\text{Interp}}(t) = \begin{cases} I(t), & L_t = 1 \\ m, & \text{otherwise} \end{cases}$$
 
-### Step 4 — Compute VUSi_m
+### Step 4 — Compute $VUSi^m$
 For each sensitivity level m, compute VUS-PR on the penalized scores:
 
-$$\text{VUSi}_m = \text{VUS-PR}(PS^m)$$
+$$\text{VUSi}^m = \text{VUS-PR}(PS^m)$$
 
 ### Step 5 — Aggregate to obtain aVUSi
 aVUSi is the area under the VUSi(m) curve as m sweeps from 0 to 1:
 
-$$\text{aVUSi}(X) = \int_0^1 \text{VUSi}_m \, dm \approx \frac{1}{M} \sum_{i=0}^{M-1} \text{VUSi}_{m_i}$$
+$$\text{aVUSi}(X) = \int_0^1 \text{VUSi}^m \, dm \approx \frac{1}{M} \sum_{i=0}^{M-1} \text{VUSi}^{m_i}$$
 
 ---
 
