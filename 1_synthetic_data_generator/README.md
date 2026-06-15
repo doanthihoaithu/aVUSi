@@ -1,7 +1,7 @@
 # Module 1 — Synthetic Data Generator
 
-This module generates synthetic multivariate time series (MTS) with configurable anomaly patterns and dimension-wise ground-truth labels. 
-These labels are required to evaluate both accuracy and interpretability in `aVUSi`.
+This module generates synthetic multivariate time series (MTS) with configurable anomaly patterns. Dimension-wise anomaly labels are produced alongside univariate labels, enabling evaluation of both detection accuracy and interpretability.
+These labels are later used to evaluate how `aVUSi` jointly capture accuracy and interpretability.
 
 ---
 
@@ -12,28 +12,6 @@ These labels are required to evaluate both accuracy and interpretability in `aVU
 ```
 
 Outputs `X`, `L`, and `DL` from this module will be used directly in **2_anomaly_detector**.
-
----
-
-## Inputs
-
-The module takes a single YAML configuration file that fully specifies the data generation process.
-Example configurations used in the aVUSi paper:
-> [`settings_six.yaml`](https://github.com/doanthihoaithu/synthsensor/blob/master/Python/generation/config/settings_six.yaml) — configuration used to generate the 974-subset synthetic benchmark dataset.
-
-Further configuration examples can be found in the [synthsensor generation configurations](https://github.com/doanthihoaithu/synthsensor/tree/master/Python/generation/config).
-
----
-
-## Outputs
-
-| Variable | Shape | Description |
-|---|---|---|
-| `X` | `(T, d)` | Multivariate time series with T timestamps and d sensor dimensions |
-| `L` | `(T,)` | Univariate anomaly labels — 1 if any dimension is anomalous at timestamp t |
-| `DL` | `(T, d)` | Dimension-wise anomaly labels — 1 for each dimension that is truly anomalous |
-
-Dimension-wise labels `DL` are essential for computing `IndepNDCG` and `aVUSi`, as they define the ground truth for interpretability evaluation.
 
 ---
 
@@ -69,6 +47,30 @@ This module extends **synthsensor** — a synthetic sensor time series generator
 ```
 
 ---
+
+
+## Inputs
+
+The module takes a single YAML configuration file that fully specifies the data generation process.
+Example configurations used in the aVUSi paper:
+> [`settings_six.yaml`](https://github.com/doanthihoaithu/synthsensor/blob/master/Python/generation/config/settings_six.yaml) — configuration used to generate the 974-subset synthetic benchmark dataset.
+
+Further configuration examples can be found in the [synthsensor generation configurations](https://github.com/doanthihoaithu/synthsensor/tree/master/Python/generation/config).
+
+---
+
+## Outputs
+
+| Variable | Shape | Description |
+|---|---|---|
+| `X` | `(T, d)` | Multivariate time series with T timestamps and d sensor dimensions |
+| `L` | `(T,)` | Univariate anomaly labels — 1 if any dimension is anomalous at timestamp t |
+| `DL` | `(T, d)` | Dimension-wise anomaly labels — 1 for each dimension that is truly anomalous |
+
+Dimension-wise labels `DL` are essential for computing `IndepNDCG` and `aVUSi`, as they define the ground truth for interpretability evaluation.
+
+---
+
 
 ## Dataset
 
