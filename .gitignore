@@ -2,7 +2,7 @@
 *.iml
 
 data
-config/config.yaml
+conf/config.yaml
 
 hydra_outputs
 **/__pycache__/
