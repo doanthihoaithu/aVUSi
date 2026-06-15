@@ -284,26 +284,112 @@ The three numbered modules form a sequential pipeline:
 
 ## Usage
 
+### 1. Generate demo data
+
+<table><tr><td>
+
 ```python
-from avusi import compute_avusi
+from main import generate_demo_data, plot_demo_data
 
-# Inputs
-# S     : anomaly score sequence, shape (T,)
-# L     : univariate labels, shape (T,)
-# DCM   : dimension contribution matrix, shape (T, d)
-# DL    : dimension-wise labels, shape (T, d)
-
-score = compute_avusi(
-    S=S,
-    L=L,
-    DCM=DCM,
-    DL=DL,
-    k=5,       # NDCG ranking cutoff
-    w=10,      # smoothing window size
-    M=50,      # number of sensitivity levels
+demo = generate_demo_data(
+    T=1000,
+    d=5,
+    anomalous_areas=((100, 150), (400, 470), (700, 760)),
+    normal_areas=((250, 290), (580, 620)),
+    seed=42,
 )
-print(f"aVUSi = {score:.4f}")
+
+# demo keys:
+#   DL         (T, d) — dimension-wise labels
+#   L          (T,)   — univariate labels
+#   S          (T,)   — anomaly score sequence
+#   DCM        (T, d) — dimension contribution matrix
+#   dim_values (T, d) — raw per-dimension scores
+
+plot_demo_data(demo, out_dir="figures/usage_in_readme")
 ```
+
+</td><td>
+
+![Demo data](figures/usage_in_readme/demo_data.png)
+
+</td></tr></table>
+
+### 2. Compute metrics
+
+```python
+import numpy as np
+from metrics.ffvus.ffvus_metrics import FFVUS
+from metrics.interpretability_metrics import IndependentNDCG, AVUSI
+
+S   = demo["S"].astype(np.float64)
+L   = demo["L"].astype(np.float64)
+DL  = demo["DL"].astype(np.float64)
+DCM = demo["DCM"].astype(np.float64)
+
+k = demo["dim_values"].shape[1] // 2   # NDCG cutoff ≈ d/2
+w = 5                                   # smoothing window
+M = 50                                  # sensitivity levels
+
+# VUS-PR — detection accuracy
+vus_pr_result = FFVUS(slope=10).score(L, S)
+print(f"VUS-PR    = {vus_pr_result['value']:.4f}")
+
+# IndepNDCG — interpretability (independent of accuracy)
+indep_ndcg_metric = IndependentNDCG(
+    max_k=k, max_smoothing_window=w,
+    k_slide=1, smoothing_window_slide=1,
+    fix_k=True, fix_smoothing_window=True,
+    default_selected_k=k, default_selected_smoothing_window=w,
+)
+indep_ndcg_results = indep_ndcg_metric.score_for_different_k(
+    y_score=S, y_true_multivariate=DL, dimension_contribution=DCM,
+)
+print(f"IndepNDCG = {indep_ndcg_results[(k, w)]['value']:.4f}")
+
+# aVUSi — combined accuracy + interpretability
+avusi_metric = AVUSI(
+    max_k=k, max_smoothing_window=w, max_n_interpretability_sensitivity_levels=M,
+    k_slide=1, smoothing_window_slide=1, n_interpretability_sensitivity_levels_slide=1,
+    fix_k=True, fix_smoothing_window=True, fix_n_interpretability_sensitivity_levels=True,
+    default_selected_k=k, default_selected_smoothing_window=w,
+    default_selected_n_interpretability_sensitivity_levels=M,
+    vus_slope=5, vus_n_thresholds=M,
+)
+avusi_results = avusi_metric.score_for_different_k(
+    y_true_univariate=L, y_score_univariate=S,
+    y_true_multivariate=DL, dimension_contribution_multivariate=DCM,
+)
+print(f"aVUSi     = {avusi_results[(k, w, M)]['value']:.4f}")
+```
+
+### 3. Plot VUSi curve
+
+<table><tr><td>
+
+```python
+from main import plot_vusi_curve
+
+plot_vusi_curve(
+    avusi_results,
+    k=k,
+    w=w,
+    M=M,
+    vus_pr=vus_pr_result["value"],
+    out_dir="figures/usage_in_readme",
+)
+```
+
+The plot shows:
+- **VUSi(m) curve** — penalized VUS-PR as m sweeps 0 → 1.
+- **Shaded area** — aVUSi (area under the curve), annotated with its value.
+- **VUS-PR line** — dashed horizontal reference with an inline label.
+
+</td><td>
+
+![VUSi curve](figures/usage_in_readme/vusi_curve.png)
+
+</td></tr></table>
 
 ## License
 
