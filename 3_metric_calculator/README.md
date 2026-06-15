@@ -67,25 +67,6 @@ $$\text{aVUSi}(X) = \int_0^1 \text{VUSi}^m \, dm \approx \frac{1}{M} \sum_{i=0}^
 
 ---
 
-## Usage
-
-```python
-from avusi import compute_avusi
-
-score = compute_avusi(
-    S=S,       # anomaly scores, shape (T,)
-    L=L,       # univariate labels, shape (T,)
-    DCM=DCM,   # dimension contribution matrix, shape (T, d)
-    DL=DL,     # dimension-wise labels, shape (T, d)
-    k=5,       # NDCG ranking cutoff
-    w=10,      # smoothing window size
-    M=50,      # number of sensitivity levels
-)
-print(f"aVUSi = {score:.4f}")
-```
-
----
-
 ## Hyperparameters
 
 | Parameter | Default | Description |
@@ -103,3 +84,32 @@ print(f"aVUSi = {score:.4f}")
 | **Boundedness** | aVUSi(X) ∈ [0, 1] for any MTS X |
 | **Monotonicity** | Pointwise improvement in interpretability does not decrease aVUSi |
 | **Consistency** | When all anomalous timestamps are fully interpretable, aVUSi ≥ VUS-PR(S) |
+
+---
+
+## Usage
+
+A full end-to-end example — generating demo data, running all three metrics, and plotting the VUSi curve — is provided in the root [`README.md § Usage`](../README.md#usage) and the accompanying [`main.py`](../main.py).
+
+The core API calls for this module are:
+
+```python
+from metrics.ffvus.ffvus_metrics import FFVUS
+from metrics.interpretability_metrics import IndependentNDCG, AVUSI
+
+# VUS-PR
+vus_pr_result = FFVUS(slope=10).score(L, S)
+
+# IndepNDCG
+indep_ndcg_results = IndependentNDCG(...).score_for_different_k(
+    y_score=S, y_true_multivariate=DL, dimension_contribution=DCM
+)
+
+# aVUSi
+avusi_results = AVUSI(...).score_for_different_k(
+    y_true_univariate=L, y_score_univariate=S,
+    y_true_multivariate=DL, dimension_contribution_multivariate=DCM,
+)
+```
+
+See [`main.py`](../main.py) for the full parameter setup and [`README.md § Usage`](../README.md#usage) for the expected outputs and figures.
