@@ -174,17 +174,18 @@ def plot_demo_data(data: dict, out_dir=None) -> None:
     plt.show()
 
 
-def plot_vusi_curve(avusi_results: dict, k: int, w: int, M: int, vus_pr: float, out_dir=None) -> None:
+def plot_vusi_curve(avusi_results: dict, k: int, w: int, M: int, vus_pr: float, indep_ndcg: float, out_dir=None) -> None:
     """
     Plot the VUSi(m) curve, shade the area under it (= aVUSi), and draw VUS-PR
-    as a horizontal reference line.
+    and IndepNDCG as horizontal reference lines.
 
     Args:
         avusi_results: dict returned by AVUSI.score_for_different_k().
         k: NDCG cutoff used when computing the results.
         w: smoothing window used when computing the results.
         M: number of sensitivity levels used when computing the results.
-        vus_pr: VUS-PR accuracy score to display as a horizontal reference line.
+        vus_pr: VUS-PR score — plotted as a horizontal reference line.
+        indep_ndcg: IndepNDCG score — plotted as a horizontal reference line.
     """
     m_levels = np.asarray(avusi_results[f"n_interpretability_sensitivity_levels_{M}_M_list"])
     vusi_values = np.asarray(avusi_results[(k, w, M)]["vus_pr_list"])
@@ -205,13 +206,22 @@ def plot_vusi_curve(avusi_results: dict, k: int, w: int, M: int, vus_pr: float, 
         fontsize=11, color="steelblue", fontweight="bold",
     )
 
-    # VUS-PR as a horizontal reference line with inline label above the line
+    # VUS-PR horizontal reference line with inline label above
     ax.axhline(vus_pr, color="tomato", linewidth=1.5, linestyle="--",
                label=f"VUS-PR = {vus_pr:.4f}")
     ax.text(
         m_levels[-1], vus_pr, f"VUS-PR = {vus_pr:.4f}",
         ha="right", va="bottom",
         fontsize=10, color="tomato", fontweight="bold",
+    )
+
+    # IndepNDCG horizontal reference line with inline label above
+    ax.axhline(indep_ndcg, color="seagreen", linewidth=1.5, linestyle="--",
+               label=f"IndepNDCG = {indep_ndcg:.4f}")
+    ax.text(
+        m_levels[-1], indep_ndcg, f"IndepNDCG = {indep_ndcg:.4f}",
+        ha="right", va="bottom",
+        fontsize=10, color="seagreen", fontweight="bold",
     )
 
     ax.set_xlabel(r"Sensitivity level $m$", fontsize=11)
@@ -319,4 +329,5 @@ if __name__ == '__main__':
                     w=default_smoothing_window_w,
                     M=default_sensitivity_levels_m,
                     vus_pr=vus_pr_result["value"],
+                    indep_ndcg=indep_ndcg_value,
                     out_dir=out_dir)

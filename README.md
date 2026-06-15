@@ -390,6 +390,7 @@ plot_vusi_curve(
     w=w,
     M=M,
     vus_pr=vus_pr_result["value"],
+    indep_ndcg=indep_ndcg_results[(k, w)]["value"],
     out_dir="figures/usage_in_readme",
 )
 ```
@@ -397,7 +398,8 @@ plot_vusi_curve(
 The plot shows:
 - **VUSi(m) curve** — the penalized VUS-PR score at each sensitivity level m.
 - **Shaded area** — the area under the VUSi curve, equal to aVUSi, annotated with its value.
-- **VUS-PR line** — a dashed horizontal reference line with an inline label above it.
+- **VUS-PR line** — a dashed red horizontal reference line with an inline label above it.
+- **IndepNDCG line** — a dashed green horizontal reference line with an inline label above it.
 
 </td><td>
 
