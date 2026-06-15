@@ -284,7 +284,13 @@ The three numbered modules form a sequential pipeline:
 
 ## Usage
 
+Run `main.py` to execute the full pipeline on synthetic demo data and compute all three metrics. The script is organized into three sections corresponding to the three modules.
+
 ### 1. Generate demo data
+
+Generates a synthetic multivariate time series with three anomalous windows and two normal windows that contain elevated anomaly scores, then plots the per-dimension values, univariate anomaly score, and ground-truth labels.
+
+**Output**: MTS `X` of shape `(T, d)`, univariate labels `L` of shape `(T,)`, dimension-wise labels `DL` of shape `(T, d)`, anomaly scores `S` of shape `(T,)`, and dimension contribution matrix `DCM` of shape `(T, d)`.
 
 <table><tr><td>
 
@@ -304,7 +310,7 @@ demo = generate_demo_data(
 #   L          (T,)   — univariate labels
 #   S          (T,)   — anomaly score sequence
 #   DCM        (T, d) — dimension contribution matrix
-#   dim_values (T, d) — raw per-dimension scores
+#   X          (T, d) — multivariate time series
 
 plot_demo_data(demo, out_dir="figures/usage_in_readme")
 ```
@@ -317,6 +323,12 @@ plot_demo_data(demo, out_dir="figures/usage_in_readme")
 
 ### 2. Compute metrics
 
+Computes three metrics on the demo data: `VUS-PR` for independent accuracy, `IndepNDCG` for independent interpretability, and `aVUSi` for the combined evaluation. Default hyperparameters are `k = d/2`, `w = 5`, and `M = 50`.
+
+> The `IndepNDCG` and `aVUSi` APIs support sweeping over hyperparameter grids. Results are returned as dictionaries keyed by `(k, w)` or `(k, w, M)`, where each entry contains a `value` field for the metric score and a `computation_time` field. The default hyperparameter combination is selected for display here.
+
+**Output**: VUS-PR, IndepNDCG, and aVUSi scores, each in `[0, 1]`.
+
 ```python
 import numpy as np
 from metrics.ffvus.ffvus_metrics import FFVUS
@@ -327,7 +339,7 @@ L   = demo["L"].astype(np.float64)
 DL  = demo["DL"].astype(np.float64)
 DCM = demo["DCM"].astype(np.float64)
 
-k = demo["dim_values"].shape[1] // 2   # NDCG cutoff ≈ d/2
+k = demo["X"].shape[1] // 2   # NDCG cutoff ≈ d/2
 w = 5                                   # smoothing window
 M = 50                                  # sensitivity levels
 
@@ -365,6 +377,8 @@ print(f"aVUSi     = {avusi_results[(k, w, M)]['value']:.4f}")
 
 ### 3. Plot VUSi curve
 
+After computing `aVUSi`, plots the `VUSi(m)` curve to visualize how interpretability penalization affects detection performance as the sensitivity level `m` varies from 0 to 1. The area under this curve equals the `aVUSi` score.
+
 <table><tr><td>
 
 ```python
@@ -381,9 +395,9 @@ plot_vusi_curve(
 ```
 
 The plot shows:
-- **VUSi(m) curve** — penalized VUS-PR as m sweeps 0 → 1.
-- **Shaded area** — aVUSi (area under the curve), annotated with its value.
-- **VUS-PR line** — dashed horizontal reference with an inline label.
+- **VUSi(m) curve** — the penalized VUS-PR score at each sensitivity level m.
+- **Shaded area** — the area under the VUSi curve, equal to aVUSi, annotated with its value.
+- **VUS-PR line** — a dashed horizontal reference line with an inline label above it.
 
 </td><td>
 
