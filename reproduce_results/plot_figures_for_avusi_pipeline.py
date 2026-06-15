@@ -10,6 +10,11 @@ from scipy.ndimage import uniform_filter1d
 
 from metrics.ffvus.ffvus_metrics import FFVUS
 
+# ── Output directory ──────────────────────────────────────────────────────────
+CURRENT_DIR = os.path.dirname(__file__)
+OUTPUT_DIR = os.path.join(CURRENT_DIR, 'combined_figures')
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # PART 1 — DEMO DATA GENERATION
@@ -564,10 +569,12 @@ if __name__ == "__main__":
     print(f"VUS-PR = {data['vus_pr']:.3f}")
     print(f"Anomaly ratio = {data['L'].mean():.3f}")
 
+    save_path = os.path.join(OUTPUT_DIR,'avusi_illustration')
+
     # Plot and save
     fig = plot_avusi_pipeline(
         data=data,
         detector_name="Synthetic",
         figsize=(7, 6),
-        save_path="figures/avusi_illustration",
+        save_path=save_path,
     )
