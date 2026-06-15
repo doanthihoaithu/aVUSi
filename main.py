@@ -81,7 +81,7 @@ def generate_demo_data(
         "DL": DL,
         "L": L,
         "S": S,
-        "dim_values": dim_values,
+        "X": dim_values,
         "DCM": DCM,
         "anomalous_dims_per_area": anomalous_dims_per_area,
         "normal_areas": normal_areas,
@@ -100,7 +100,7 @@ def plot_demo_data(data: dict, out_dir=None) -> None:
     S = data["S"]
     DL = data["DL"]
     L = data["L"]
-    dim_values = data["dim_values"]
+    X = data["X"]
     T, d = DL.shape
     t = np.arange(T)
 
@@ -132,7 +132,7 @@ def plot_demo_data(data: dict, out_dir=None) -> None:
     # --- per-dimension subplots ---
     for dim in range(d):
         ax = axes[dim]
-        ax.plot(t, dim_values[:, dim], color="steelblue", linewidth=0.9)
+        ax.plot(t, X[:, dim], color="steelblue", linewidth=0.9)
         _shade_segments(ax, DL[:, dim] == 1)
         ax.set_ylabel(f"Dim {dim}", fontsize=9)
         ax.set_ylim(-0.05, 1.1)
@@ -250,7 +250,7 @@ if __name__ == '__main__':
     plot_demo_data(demo, out_dir)
 
     #Start computing quality measures: VUS-PR (independent accuracy), IndepNDCG (independent interpretability), aVUSi (combined)
-    X= demo["dim_values"].astype(np.float64)
+    X= demo["X"].astype(np.float64)
     S = demo["S"].astype(np.float64)
     L = demo["L"].astype(np.float64)
     DL = demo["DL"].astype(np.float64)
