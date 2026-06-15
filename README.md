@@ -261,14 +261,26 @@ aVUSi/
 ├── 3_metric_calculator/          # Module 3: compute VUS-PR, IndepNDCG, and aVUSi
 │   └── README.md
 ├── conf/                         # Configuration files
-│   ├── config.yaml
-│   └── config.yaml.example
+│   ├── config.yaml               # Main configuration file for the pipeline, user need to copy config.yaml.example and fill in the paths to datasets and results in their local environment
+│   └── config.yaml.example       # Example configuration file with placeholder paths
 ├── data/                         # Input datasets (Synthetic, SMD)
 ├── figures/                      # Paper figures
 │   ├── avusi-motivation.png      # Figure 1: motivation for aVUSi
 │   └── avusi-alg.png             # Figure 2: aVUSi algorithm illustration
-├── notebooks/                    # Jupyter notebooks for analysis and visualization
-├── output/                       # Detector outputs and evaluation results
+├── reproduce_results/            # Scripts and notebook to reproduce all paper figures
+│   ├── plot_figures_in_the_paper.ipynb        # Main notebook — run this to reproduce all figures
+│   ├── plot_figures_for_the paper.py          # Figure functions for evaluation results
+│   ├── plot_figures_for_avusi_pipeline.py     # Figure function for the aVUSi pipeline illustration
+│   └── combined_figures/                      # Output directory (auto-created)
+├── results/                      # Pre-computed evaluation results (CSV) used by the notebook
+│   ├── settings_six/
+│   │   ├── results.csv                        # Combine of all metrics for all detectors in one file
+│   │   ├── series_information.csv
+│   │   └── new_metrics/                       # Computed measures (VUS-PR, IndepNDCG, aVUSi) for all detectors separately
+│   └── smd/
+│       ├── results.csv                        # Combine of all metrics for all detectors in one file
+│       ├── series_information.csv
+│       └── new_metrics/                       # Computed measures (VUS-PR, IndepNDCG, aVUSi) for all detectors separately
 ├── requirements.txt
 └── README.md
 ```
