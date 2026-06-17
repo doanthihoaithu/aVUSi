@@ -153,8 +153,21 @@ Try to run all detectors on a dataset by modifying `conf/config.yaml` and then e
 python 2_anomaly_detector/runner.py
 ```
 
+Repeat steps 2–3 for each detector by changing `mts_running_detector` each time.
+
+**4. (Optional) Compute the Average Ensemble (AvgEns)**
+
+After all individual detectors have been run, compute ensemble scores by averaging `S` and `DCM` across detectors:
+
+```bash
+python 2_anomaly_detector/runner_for_avg_ens.py
+```
+
+Edit `running_detectors` in `runner_for_avg_ens.py` to list the detectors whose results are already available. 
+Output is written to `results/<dataset>/merged_results/avg_ens/` in the same format as individual detectors.
+
 ---
 
-**4. Results**
+**5. Results**
 
 Outputs are written to `results/<dataset>/merged_results/<detector>/`. See [`results/README.md`](results/README.md) for the full directory layout and file descriptions.

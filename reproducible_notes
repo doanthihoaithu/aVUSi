@@ -72,6 +72,16 @@ STEP 3 — Run anomaly detectors  (Module 2)
   3. Run:
        python 2_anomaly_detector/runner.py
 
+  4. (Optional) Compute the Average Ensemble (AvgEns) detector:
+     After all individual detectors have been run, compute the ensemble scores by
+     averaging S and DCM across detectors:
+
+       python 2_anomaly_detector/runner_for_avg_ens.py
+
+     Edit runner_for_avg_ens.py before running:
+       running_detectors: list of detectors whose results are already available
+                          (default: ['hbos', 'cblof', 'tran_ad'])
+
   Output  →  2_anomaly_detector/results/<settings_name>/merged_results/<detector>/
         results.csv                                      summary metrics across all batches
         <batch>.csv/
