@@ -1,0 +1,68 @@
+# data/
+
+Input data for Module 2. Populated by running `process_synthetic_data_for_running_mts_detectors.py` from the project root (see `reproducible_notes`, Step 2).
+
+## Expected Structure
+
+```
+data/
+└── mts/
+    └── <dataset_name>/             # matches mts_running_dataset in conf/config.yaml
+        ├── scaler/
+        │   └── scaler.gz           # fitted StandardScaler, persisted after training and reloaded for inference
+        └── semisupervised/
+            ├── synthetic_train.csv              # anomaly-free training split
+            ├── synthetic_batch_<id>.csv         # test batch
+            ├── synthetic_batch_<id>.labels.csv  # dimension-wise labels for the test batch
+            ├── ...
+            └── datasets_merged.json             # single merged index across all batches, used by runner.py
+```
+
+## File Formats
+
+**`synthetic_train.csv`** and **`synthetic_batch_<id>.csv`** — multivariate time series with labels:
+
+| Column | Variable | Description |
+|---|---|---|
+| `timestamp` | index | integer row index |
+| `Sensor0` … `Sensor<d-1>` | `X` | raw sensor values, one column per dimension |
+| `is_anomaly` | `L` | univariate anomaly label — `1.0` if any dimension is anomalous, `0.0` otherwise |
+
+`synthetic_train.csv` is anomaly-free (`is_anomaly` is always `0.0`). It is used to fit the detector and the scaler.
+
+---
+
+**`synthetic_batch_<id>.labels.csv`** — dimension-wise anomaly labels (`DL`):
+
+
+
+| Column | Variable | Description |
+|---|---|---|
+| `timestamp` | index | integer row index, aligned with the corresponding batch CSV |
+| `AnomalyFlag0` … `AnomalyFlag<d-1>` | `DL` | `1.0` if dimension `i` is truly anomalous at this timestamp, `0.0` otherwise |
+
+---
+
+**`datasets_merged.json`** — single entry listing all test batches under one dataset key, consumed by `runner.py` when running all batches in a single pass:
+
+```json
+{
+  "<dataset_name>": {
+    "train_paths": ["./synthetic_train.csv"],
+    "test_paths":  ["./synthetic_batch_0.csv", "./synthetic_batch_1.csv", "..."],
+    "type": "synthetic test"
+  }
+}
+```
+
+## How to Populate
+
+```bash
+# 1. Set the target dataset in the root Hydra config
+#    conf/config.yaml  →  mts_running_dataset: <dataset_name>
+
+# 2. Run the processing script from the project root
+python process_synthetic_data_for_running_mts_detectors.py
+```
+
+Source data is read from `1_synthetic_data_generator/zip/<dataset_name>/` (produced by Module 1).

@@ -67,7 +67,7 @@ The DCM is computed differently per detector family:
 
 Formally, for a raw per-dimension score vector $e_t \in \mathbb{R}^d$ at timestamp $t$:
 
-$$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{t,j})}$$
+$$\text{DCM}(t) = \text{L1 Normalization}(e_t) = \frac{e_t}{\sum_{j=1}^{d} e_{t,j}}$$
 
 ---
 
@@ -80,17 +80,7 @@ $$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{
 │   ├── config.yaml             # Hydra configuration (dataset, detectors, paths)
 │   └── config.yaml.example
 ├── data/
-│   └── mts/
-│       └── <config_name>/      # one folder per dataset (e.g. settings_six)
-│           ├── scaler/
-│           │   └── scaler.gz   # fitted scaler persisted for inference
-│           └── semisupervised/
-│               ├── datasets.json          # per-batch index for the runner
-│               ├── datasets_merged.json   # merged index across all batches
-│               ├── synthetic_train.csv    # anomaly-free training split (X, L, DL)
-│               ├── synthetic_batch_0.csv  # test batch (X, L)
-│               ├── synthetic_batch_0.labels.csv  # dimension-wise labels (DL)
-│               └── ...
+│   └── ...                     # see data/README.md
 ├── detectors/
 │   ├── Detector.py             # abstract base class for all detectors
 │   ├── <Name>Detector.py       # one wrapper per detector (10 total)
@@ -99,15 +89,7 @@ $$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{
 ├── post_processing_utils/
 │   └── window.py               # sliding-window score aggregation utilities
 ├── results/
-│   └── <config_name>/
-│       └── merged_results/
-│           └── <detector>/     # one folder per detector (e.g. hbos)
-│               ├── results.csv                              # summary metrics
-│               └── <batch>.csv/
-│                   ├── anomaly-scores.csv                   # S
-│                   ├── docker-algorithm-dimension-contribution.csv  # DCM
-│                   ├── docker-algorithm-scores-per-var.csv  # raw per-dim scores
-│                   └── docker-algorithm-multivariate-labels.csv
+│   └── ...                     # see results/README.md
 ├── hydra_outputs/
 │   └── runner.log
 ├── runner.py     # main entry point — iterates batches and detectors
@@ -115,7 +97,7 @@ $$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{
 └── utils.py      # data loading and pre-processing helpers
 ```
 
-Input data under `data/mts/` is produced by `process_synthetic_data_for_running_mts_detectors.py` (root-level script) from Module 1 outputs. Results under `results/` are consumed by **Module 3**.
+See [`data/README.md`](data/README.md) for input data structure and [`results/README.md`](results/README.md) for output structure.
 
 ---
 
@@ -175,31 +157,4 @@ python 2_anomaly_detector/runner.py
 
 **4. Results**
 
-Outputs are written to `results/<dataset>/merged_results/<detector>/` with the following layout:
-
-```
-results/
-└── <dataset>/                         # e.g. settings_six
-    └── merged_results/
-        └── <detector>/                # e.g. hbos
-            ├── results.csv            # summary metrics (VUS-PR, IndepNDCG, aVUSi) across all batches
-            └── <batch>.csv/           # one folder per test batch
-                ├── anomaly-scores.csv                          # S  — final anomaly score sequence (T,) after scaling to [0, 1]
-                ├── docker-algorithm-dimension-contribution.csv # DCM — L1 normalization dimension contributions (T, d)
-                ├── docker-algorithm-scores.csv                 # raw detector score before post-processing (T,)
-                ├── docker-algorithm-scores-per-var.csv         # raw per-dimension scores before being normalized (T, d), processed by L1 normalization to compute DCM
-                └── docker-algorithm-multivariate-labels.csv    # dimension-wise binary labels (T, d)
-```
-
-
-> **For real-world datasets (e.g., `SMD`), organize the detector output in the
-above format to ensure compatibility with the metric calculator.**
-
-
-
-The two files consumed by **Module 3** are:
-
-| File | Variable | Shape | Description                                           |
-|---|---|---|-------------------------------------------------------|
-| `anomaly-scores.csv` | `S` | `(T,)` | Anomaly score sequence passed to VUS-PR and aVUSi     |
-| `docker-algorithm-dimension-contribution.csv` | `DCM` | `(T, d)` | Dimension contributions passed to IndepNDCG and aVUSi |
+Outputs are written to `results/<dataset>/merged_results/<detector>/`. See [`results/README.md`](results/README.md) for the full directory layout and file descriptions.

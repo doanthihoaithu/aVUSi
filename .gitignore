@@ -13,5 +13,7 @@ hydra_outputs
 1_synthetic_data_generator/data
 1_synthetic_data_generator/zip
 2_anomaly_detector/data
+!2_anomaly_detector/data/README.md
 **/conf/config.yaml
 2_anomaly_detector/results
+!2_anomaly_detector/results/README.md
