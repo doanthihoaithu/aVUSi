@@ -1,0 +1,30 @@
+# Core ML frameworks
+# PyTorch: for CUDA 11.8 install with:
+#   pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cu118
+torch>=2.1.0
+tensorflow==2.15.0
+keras>=2.15.0
+
+# Numerical / data science
+numpy>=1.24.0,<2.0.0
+pandas>=2.0.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+scikit-image>=0.21.0
+
+# Anomaly detection
+pyod>=1.1.3
+
+# Visualisation
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Configuration
+hydra-core>=1.3.0
+omegaconf>=2.3.0
+
+# Utilities
+tqdm>=4.65.0
+joblib>=1.3.0
+psutil>=5.9.0
+tensorboard>=2.14.0
