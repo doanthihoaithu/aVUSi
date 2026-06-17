@@ -1,6 +1,6 @@
 # results/
 
-Output directory for Module 2. Populated automatically by `runner.py` after running each detector on each batch.
+Output directory for Module 2. Populated by `runner.py` (individual detectors) and `runner_for_avg_ens.py` (Average Ensemble).
 
 ## Expected Structure
 
@@ -8,7 +8,7 @@ Output directory for Module 2. Populated automatically by `runner.py` after runn
 results/
 └── <dataset_name>/                  # matches mts_running_dataset in conf/config.yaml
     └── merged_results/
-        └── <detector>/              # e.g. hbos, tran_ad, cblof, ...
+        └── <detector>/              # e.g. hbos, tran_ad, cblof, avg_ens, ...
             ├── results.csv          # summary row per batch (algorithm, collection, dataset)
             └── <batch>.csv/         # one folder per test batch, named after the batch file
                 ├── anomaly-scores.csv                          # S   — final anomaly score sequence (T,)
@@ -42,8 +42,12 @@ The two files consumed by **Module 3** are `anomaly-scores.csv` (`S`) and `docke
 cp 2_anomaly_detector/conf/config.yaml.example 2_anomaly_detector/conf/config.yaml
 #    Set mts_running_dataset and mts_running_detector in config.yaml
 
-# 3. Run the detector
+# 3. Run an individual detector (repeat for each detector)
 python 2_anomaly_detector/runner.py
+
+# 4. (Optional) Compute the Average Ensemble after all individual detectors are done
+#    Edit running_detectors in runner_for_avg_ens.py to list available detectors, then:
+python 2_anomaly_detector/runner_for_avg_ens.py
 ```
 
-Results are written incrementally — one batch folder at a time — so partial runs produce valid output for completed batches.
+Individual detector results are written incrementally — one batch folder at a time — so partial runs produce valid output for completed batches. The `avg_ens` folder is populated in a single pass over all batches once the ensemble is computed.
