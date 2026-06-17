@@ -1,3 +1,11 @@
+# Adapted from https://github.com/TimeEval/TimeEval-algorithms
+# Original License: MIT License
+#
+# Modifications:
+# - Added statements to extract per-dimension contribution scores (DCM)
+# - Added statements to save anomaly scores, dimension contributions, and related outputs to files
+
+
 # -*- coding: utf-8 -*-
 """Histogram-based Outlier Detection (HBOS)
 Source code is modified based on the original version taken from https://pyod.readthedocs.io/en/latest/_modules/pyod/models/hbos.html (pyod 1.1.4 documentation)

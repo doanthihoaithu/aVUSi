@@ -1,3 +1,10 @@
+# Adapted from https://github.com/imperial-qore/TranAD/tree/main
+# Original License: BSD 3-Clause License
+#
+# Modifications:
+# - Added statements to extract per-dimension contribution scores (DCM)
+# - Added statements to save anomaly scores, dimension contributions, and related outputs to files
+
 import math
 
 from torch import nn

@@ -1,3 +1,10 @@
+# Adapted from https://github.com/ML4ITS/mtad-gat-pytorch/tree/main
+# Original License: MIT License
+#
+# Modifications:
+# - Added statements to extract per-dimension contribution scores (DCM)
+# - Added statements to save anomaly scores, dimension contributions, and related outputs to files
+
 import torch
 import torch.nn as nn
 from omegaconf import DictConfig

@@ -1,3 +1,11 @@
+# Adapted from https://github.com/TimeEval/TimeEval-algorithms
+# Original License: MIT License
+#
+# Modifications:
+# - Added statements to extract per-dimension contribution scores (DCM)
+# - Added statements to save anomaly scores, dimension contributions, and related outputs to files
+
+
 # -*- coding: utf-8 -*-
 """Clustering Based Local Outlier Factor (CBLOF)
 """

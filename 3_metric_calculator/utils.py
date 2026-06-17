@@ -54,3 +54,13 @@ def estimate_dimension_contribution_by_anomaly_score_with_a_buffer(
     estimated = np.trapz(integrand, axis=1)                   # (T, D)
 
     return estimated
+
+def transform_to_dimension_contribution(scores_per_var):
+    # scores_per_var is a 2D array of shape (n_samples, n_features)
+    # We want to transform it to dimension contribution such that higher scores indicate higher contribution to anomaly
+    # One simple way is to normalize the scores_per_var for each sample and then take the negative log to get contribution
+    # Adding a small epsilon to avoid log(0)
+    epsilon = 1e-10
+    normalized_scores = scores_per_var / (np.sum(scores_per_var, axis=1, keepdims=True) + epsilon)
+    dimension_contribution = normalized_scores
+    return dimension_contribution

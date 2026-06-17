@@ -1,3 +1,10 @@
+# Adapted from https://github.com/TimeEval/TimeEval-algorithms
+# Original License: MIT License
+#
+# Modifications:
+# - Added statements to extract per-dimension contribution scores (DCM)
+# - Added statements to save anomaly scores, dimension contributions, and related outputs to files
+
 import shutil, os
 import tensorflow as tf
 from tensorflow import keras
