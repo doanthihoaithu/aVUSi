@@ -113,3 +113,37 @@ avusi_results = AVUSI(...).score_for_different_k(
 ```
 
 See [`main.py`](../main.py) for the full parameter setup and [`README.md § Usage`](../README.md#usage) for the expected outputs and figures.
+
+---
+
+## Running on the Synthetic Benchmark Dataset
+
+To compute metrics across all detectors and all batches of the synthetic dataset, run the two scripts in order:
+
+**Step 1 — Compute metrics per detector** (`synthetic_recompute_metrics.py`):
+
+```bash
+python 3_metric_calculator/synthetic_recompute_metrics.py
+```
+
+Reads `S` and `DCM` from `2_anomaly_detector/results/<dataset>/merged_results/<detector>/` and writes per-detector metric results to:
+
+```
+results/<dataset>/new_metrics/<detector>/
+    results.csv        # VUS-PR, IndepNDCG, aVUSi — one row per batch
+    vus_pr_list.csv    # VUSi(m) curve values for each batch
+```
+
+**Step 2 — Merge results across all detectors** (`synthetic_merge_results.py`):
+
+```bash
+python 3_metric_calculator/synthetic_merge_results.py
+```
+
+Concatenates all per-detector `results.csv` files into a single file:
+
+```
+results/<dataset>/results.csv   # all detectors, all batches
+```
+
+This combined file is used by the notebook in `reproduce_results/` to generate all paper figures.

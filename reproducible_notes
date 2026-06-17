@@ -112,5 +112,19 @@ STEP 4 — Compute metrics  (Module 3)
 
   Default hyperparameters:  k = d/2,  w = 5,  M = 50
 
+  For the synthetic benchmark dataset, run metrics across all detectors and batches:
+
+    Step 4a — Compute metrics per detector:
+      python 3_metric_calculator/synthetic_recompute_metrics.py
+
+      Output  →  2_anomaly_detector/results/<settings_name>/new_metrics/<detector>/results.csv
+                 2_anomaly_detector/results/<settings_name>/new_metrics/<detector>/vus_pr_list.csv
+
+    Step 4b — Merge all detector results into a single file:
+      python 3_metric_calculator/synthetic_merge_results.py
+
+      Output  →  2_anomaly_detector/results/<settings_name>/results.csv
+                 (one row per detector per batch, all metrics combined)
+
   To reproduce all paper figures:
     reproduce_results/plot_figures_in_the_paper.ipynb

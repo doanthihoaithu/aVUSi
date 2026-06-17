@@ -8,6 +8,8 @@ mts_supported_detectors: ['cblof', 'auto_encoder', 'copod', 'denoising_auto_enco
                           'hbos', 'omni_anomaly', 'random_black_forest', 'tran_ad' , 'mtad_gat']
 
 datasets:
+  settings_five:
+    n_sensors: 10
   settings_six:
     n_sensors: 10
   smd:
@@ -20,6 +22,21 @@ demo_config:
 
 parameter_sensitivity_analysis:
   datasets:
+    settings_five:
+      max_k: ${datasets.settings_five.n_sensors}
+      max_smoothing_window: 10
+      max_n_interpretability_sensitivity_levels: 50
+      k_slide: 1
+      smoothing_window_slide: 1
+      n_interpretability_sensitivity_levels_slide: 10
+      fix_k: False
+      fix_smoothing_window: True
+      fix_n_interpretability_sensitivity_levels: True
+      default_selected_k: 5
+      default_selected_smoothing_window: 10
+      default_selected_n_interpretability_sensitivity_levels: 50
+      vus_slope: 64
+      vus_n_thresholds: 250
     settings_six:
       max_k: ${datasets.settings_six.n_sensors}
       max_smoothing_window: 10
@@ -50,3 +67,21 @@ parameter_sensitivity_analysis:
       default_selected_n_interpretability_sensitivity_levels: 50
       vus_slope: 64
       vus_n_thresholds: 250
+
+mts_running_dataset: settings_five
+current_n_dimensions: ${datasets.${mts_running_dataset}.n_sensors}
+
+synthetic_generation:
+  generated_data_dir: 1_synthetic_data_generator/data/${mts_running_dataset}
+  generated_zip_data_dir: 1_synthetic_data_generator/zip/${mts_running_dataset}
+
+timeeval_mts_data_dir: 2_anomaly_detector/data/mts/${mts_running_dataset}
+data_folder: 2_anomaly_detector/data/mts/${mts_running_dataset}
+scaler_folder: ${data_folder}/scaler
+
+merge_results:
+  mts_running_dataset: ${mts_running_dataset}  #  settings_five, settings_six
+  data_folder: 2_anomaly_detector/data/mts/${mts_running_dataset}
+  results_path: 2_anomaly_detector/results/${mts_running_dataset}/merged_results
+  notebook_visualization:
+    results_path: results/${mts_running_dataset}

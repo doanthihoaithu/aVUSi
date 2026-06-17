@@ -17,3 +17,4 @@ hydra_outputs
 **/conf/config.yaml
 2_anomaly_detector/results
 !2_anomaly_detector/results/README.md
+results/settings_five

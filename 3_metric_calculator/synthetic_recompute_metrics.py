@@ -1,3 +1,4 @@
+import logging
 import os
 from multiprocessing import Pool
 
@@ -10,6 +11,7 @@ from metrics.ffvus.ffvus_metrics import FFVUS
 from metrics.interpretability_metrics import AVUSI, IndependentNDCG
 from utils import load_data_from_json, get_project_root, process_metric_results
 
+logger = logging.getLogger(__name__)
 
 @hydra.main(config_path="../conf", config_name="config.yaml")
 def main(config: DictConfig):
@@ -22,11 +24,14 @@ def main(config: DictConfig):
 
     project_root_dir = get_project_root()
     merged_results_dir = os.path.join(project_root_dir, config.merge_results.results_path)
-    supported_detectors = config.mts_supported_detectors
+    computed_metrics_dir = os.path.join(project_root_dir, config.merge_results.notebook_visualization.results_path)
+    os.makedirs(computed_metrics_dir, exist_ok=True)
 
-    #TODO uncomment this line when results of all supported detectors being available,
-    # assume currently we only have results of 3 detectors and we want to compute new metrics for them first
-    supported_detectors = ['hbos','tran_ad', 'cblof']
+    supported_detectors = config.mts_supported_detectors + ['avg_ens']
+
+    logger.warning('uncomment this line when results of all supported detectors being available.'
+                   'Assume currently we only have results of some detectors and we want to compute new metrics for them first')
+    supported_detectors = ['hbos','cblof','tran_ad','avg_ens']
 
     interpretability_conditional_metrics = [AVUSI(**parameter_sensitivity_config)]
     interpretability_unconditional_metrics = [IndependentNDCG(**parameter_sensitivity_config)]
@@ -45,7 +50,7 @@ def main(config: DictConfig):
     }
 
     scores_dir = merged_results_dir
-    new_metrics_dir = os.path.join(os.path.dirname(merged_results_dir), 'new_metrics')
+    new_metrics_dir = os.path.join(computed_metrics_dir, 'new_metrics')
 
     print(f'Score directory: {scores_dir}')
     print(f'new_metrics_dir directory: {new_metrics_dir}')
@@ -114,11 +119,11 @@ def process_scores_of_a_detector_synthetic(alg, scores_dir, new_metrics_dir, tes
     vus_pr_with_interpretability_df.to_csv(saved_result_path_for_interpretability)
     print(f'Save vus_pr with interpretability at', saved_result_path_for_interpretability)
 
-    if alg == 'avg_ens':
-        ready_metric_df.index = ready_metric_df.index.str.replace('.out', '.csv')
-        ready_metric_df['dataset'] = 'settings_six'
-        ready_metric_df.to_csv(ready_metric_file_path_old, index=True)
-        print(f'Saved new metric results for {alg} at ', ready_metric_file_path_old)
+    # if alg == 'avg_ens':
+    #     ready_metric_df.index = ready_metric_df.index.str.replace('.out', '.csv')
+    #     ready_metric_df['dataset'] = 'settings_six'
+    #     ready_metric_df.to_csv(ready_metric_file_path_old, index=True)
+    #     print(f'Saved new metric results for {alg} at ', ready_metric_file_path_old)
 
 
 if __name__ == '__main__':
