@@ -169,7 +169,7 @@ def plot_demo_data(data: dict, out_dir=None) -> None:
 
     plt.tight_layout()
     if out_dir == None:
-        out_dir = './'
+        out_dir = '/'
     fig.savefig(os.path.join(out_dir, "demo_data.png"), dpi=150, bbox_inches="tight")
     plt.show()
 
@@ -237,7 +237,7 @@ def plot_vusi_curve(avusi_results: dict, k: int, w: int, M: int, vus_pr: float, 
 
     plt.tight_layout()
     if out_dir == None:
-        out_dir = './'
+        out_dir = '/'
     fig.savefig(os.path.join(out_dir, "vusi_curve.png"), dpi=150, bbox_inches="tight")
     plt.show()
 

@@ -1,0 +1,106 @@
+Reproducibility Notes
+=====================
+
+Full pipeline: Module 1 → process script → Module 2 → Module 3
+
+
+────────────────────────────────────────────────────────────────
+STEP 0 — Install dependencies
+────────────────────────────────────────────────────────────────
+
+  pip install -r requirements.txt
+
+  Requirements: Python 3.11, PyTorch 2.1, TensorFlow 2.15, CUDA 11.8 (optional)
+
+
+────────────────────────────────────────────────────────────────
+STEP 1 — Generate synthetic data  (Module 1)
+────────────────────────────────────────────────────────────────
+
+  Run the extended synthsensor generator with a YAML configuration.
+  Paper config: settings_six.yaml (10 sensors, 974 subsets)
+  Repo: https://github.com/doanthihoaithu/synthsensor
+
+  Output
+    1_synthetic_data_generator/data/<settings_name>/
+        synthetic_training.csv        anomaly-free training series (X, L, DL)
+        synthetic_0.csv, ...          test batches (X, L, DL)
+        figures/                      per-batch visualisation plots
+
+    1_synthetic_data_generator/zip/<settings_name>/
+        synthetic_training.csv.zip    compressed counterparts (consumed by Step 2)
+        synthetic_0.csv.zip, ...
+
+
+────────────────────────────────────────────────────────────────
+STEP 2 — Process data for MTS detectors
+────────────────────────────────────────────────────────────────
+
+  Edit conf/config.yaml (root level):
+    mts_running_dataset: <settings_name>   # e.g. settings_six
+
+  Run:
+    python process_synthetic_data_for_running_mts_detectors.py
+
+  What it does:
+    - Reads zip files from 1_synthetic_data_generator/zip/<settings_name>/
+    - Filters out batches with anomaly ratio >= 50% or zero anomalies
+    - Writes per-batch CSVs and index files for the detector runner
+
+  Output  →  2_anomaly_detector/data/mts/<settings_name>/semisupervised/
+        synthetic_train.csv               training split (X + is_anomaly = L)
+        synthetic_batch_<id>.csv          test batch     (X + is_anomaly = L)
+        synthetic_batch_<id>.labels.csv   dimension-wise labels (DL = AnomalyFlag_* columns)
+        datasets.json                     per-batch index for the runner
+        datasets_merged.json              merged index across all batches
+
+
+────────────────────────────────────────────────────────────────
+STEP 3 — Run anomaly detectors  (Module 2)
+────────────────────────────────────────────────────────────────
+
+  1. Copy the config template:
+       cp 2_anomaly_detector/conf/config.yaml.example 2_anomaly_detector/conf/config.yaml
+
+  2. Edit 2_anomaly_detector/conf/config.yaml — key fields:
+       mts_running_dataset:   <settings_name>    # must match Step 2
+       mts_running_detector:  <detector>         # e.g. hbos, tran_ad, auto_encoder, cblof,
+                                                 #      copod, denoising_auto_encoder, encdec_ad,
+                                                 #      random_black_forest, omni_anomaly, mtad_gat
+       executionType:         all                # 'train', 'test', or 'all'
+
+  3. Run:
+       python 2_anomaly_detector/runner.py
+
+  Output  →  2_anomaly_detector/results/<settings_name>/merged_results/<detector>/
+        results.csv                                      summary metrics across all batches
+        <batch>.csv/
+            anomaly-scores.csv                           S   — anomaly score sequence (T,)
+            docker-algorithm-dimension-contribution.csv  DCM — dimension contributions (T, d)
+            docker-algorithm-scores.csv                  raw detector score before post-processing
+            docker-algorithm-scores-per-var.csv          raw per-dimension scores before L1 normalization
+            docker-algorithm-multivariate-labels.csv     dimension-wise labels DL (T, d)
+
+
+────────────────────────────────────────────────────────────────
+STEP 4 — Compute metrics  (Module 3)
+────────────────────────────────────────────────────────────────
+
+  Inputs:
+    S   ← anomaly-scores.csv                          (from Step 3)
+    DCM ← docker-algorithm-dimension-contribution.csv (from Step 3)
+    L   ← is_anomaly column in synthetic_batch_<id>.csv   (from Step 2)
+    DL  ← synthetic_batch_<id>.labels.csv             (from Step 2)
+
+  Quick demo (generates synthetic data and computes all three metrics):
+    python main.py
+
+  Metrics computed:
+    VUS-PR      detection accuracy (threshold-independent, range-based)
+    IndepNDCG   interpretability (independent of detection accuracy)
+    aVUSi       combined accuracy + interpretability
+
+  Default hyperparameters:  k = d/2,  w = 5,  M = 50
+
+  To reproduce all paper figures:
+    reproduce_results/plot_figures_in_the_paper.ipynb

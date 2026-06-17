@@ -9,3 +9,9 @@ hydra_outputs
 **/.DS_Store
 **/.hydra
 **/*.log
+
+1_synthetic_data_generator/data
+1_synthetic_data_generator/zip
+2_anomaly_detector/data
+**/conf/config.yaml
+2_anomaly_detector/results

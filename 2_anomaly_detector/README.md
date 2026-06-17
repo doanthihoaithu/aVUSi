@@ -71,6 +71,54 @@ $$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{
 
 ---
 
+## Folder Structure
+
+```
+2_anomaly_detector/
+├── README.md
+├── conf/
+│   ├── config.yaml             # Hydra configuration (dataset, detectors, paths)
+│   └── config.yaml.example
+├── data/
+│   └── mts/
+│       └── <config_name>/      # one folder per dataset (e.g. settings_six)
+│           ├── scaler/
+│           │   └── scaler.gz   # fitted scaler persisted for inference
+│           └── semisupervised/
+│               ├── datasets.json          # per-batch index for the runner
+│               ├── datasets_merged.json   # merged index across all batches
+│               ├── synthetic_train.csv    # anomaly-free training split (X, L, DL)
+│               ├── synthetic_batch_0.csv  # test batch (X, L)
+│               ├── synthetic_batch_0.labels.csv  # dimension-wise labels (DL)
+│               └── ...
+├── detectors/
+│   ├── Detector.py             # abstract base class for all detectors
+│   ├── <Name>Detector.py       # one wrapper per detector (10 total)
+│   └── <name>/                 # model implementation for each detector
+│       └── model.py
+├── post_processing_utils/
+│   └── window.py               # sliding-window score aggregation utilities
+├── results/
+│   └── <config_name>/
+│       └── merged_results/
+│           └── <detector>/     # one folder per detector (e.g. hbos)
+│               ├── results.csv                              # summary metrics
+│               └── <batch>.csv/
+│                   ├── anomaly-scores.csv                   # S
+│                   ├── docker-algorithm-dimension-contribution.csv  # DCM
+│                   ├── docker-algorithm-scores-per-var.csv  # raw per-dim scores
+│                   └── docker-algorithm-multivariate-labels.csv
+├── hydra_outputs/
+│   └── runner.log
+├── runner.py     # main entry point — iterates batches and detectors
+├── training.py   # training logic shared across detectors
+└── utils.py      # data loading and pre-processing helpers
+```
+
+Input data under `data/mts/` is produced by `process_synthetic_data_for_running_mts_detectors.py` (root-level script) from Module 1 outputs. Results under `results/` are consumed by **Module 3**.
+
+---
+
 ## Results Summary
 
 ### Synthetic Dataset
@@ -90,3 +138,68 @@ $$\text{DCM}(t) = \text{softmax}(e_t) = \frac{\exp(e_t)}{\sum_{j=1}^{d} \exp(e_{
 | COPOD | — | **Best** | 2nd |
 
 Key finding: **AvgEns consistently ranks first under aVUSi**, demonstrating that ensembling effectively balances accuracy and interpretability even when individual detectors trade one off against the other (e.g., DAE: VUS-PR = 0.85 but IndepNDCG = 0.00; HBOS: VUS-PR = 0.42 but IndepNDCG = 0.98).
+
+---
+
+## Usage
+
+This module uses [Hydra](https://hydra.cc) for configuration.
+
+**1. Create the config file**
+
+```bash
+cp conf/config.yaml.example conf/config.yaml
+```
+
+**2. Edit `conf/config.yaml`**
+
+The two most commonly changed fields are:
+
+| Field | Description | Example values |
+|---|---|---|
+| `mts_running_dataset` | Dataset to run detectors on | `settings_six`, `settings_five`, `smd` |
+| `mts_running_detector` | Detector to run | `hbos`, `tran_ad`, `auto_encoder`, `cblof`, `copod`, `denoising_auto_encoder`, `encdec_ad`, `random_black_forest`, `omni_anomaly`, `mtad_gat` |
+| `executionType` | Execution mode | `all`, `train`, `test` |
+
+Per-detector hyperparameters are defined under the `customParameters.<detector>` block and can be tuned there.
+
+**3. Run the detector**
+
+Try to run all detectors on a dataset by modifying `conf/config.yaml` and then executing:
+
+```bash
+python 2_anomaly_detector/runner.py
+```
+
+---
+
+**4. Results**
+
+Outputs are written to `results/<dataset>/merged_results/<detector>/` with the following layout:
+
+```
+results/
+└── <dataset>/                         # e.g. settings_six
+    └── merged_results/
+        └── <detector>/                # e.g. hbos
+            ├── results.csv            # summary metrics (VUS-PR, IndepNDCG, aVUSi) across all batches
+            └── <batch>.csv/           # one folder per test batch
+                ├── anomaly-scores.csv                          # S  — final anomaly score sequence (T,) after scaling to [0, 1]
+                ├── docker-algorithm-dimension-contribution.csv # DCM — L1 normalization dimension contributions (T, d)
+                ├── docker-algorithm-scores.csv                 # raw detector score before post-processing (T,)
+                ├── docker-algorithm-scores-per-var.csv         # raw per-dimension scores before being normalized (T, d), processed by L1 normalization to compute DCM
+                └── docker-algorithm-multivariate-labels.csv    # dimension-wise binary labels (T, d)
+```
+
+
+> **For real-world datasets (e.g., `SMD`), organize the detector output in the
+above format to ensure compatibility with the metric calculator.**
+
+
+
+The two files consumed by **Module 3** are:
+
+| File | Variable | Shape | Description                                           |
+|---|---|---|-------------------------------------------------------|
+| `anomaly-scores.csv` | `S` | `(T,)` | Anomaly score sequence passed to VUS-PR and aVUSi     |
+| `docker-algorithm-dimension-contribution.csv` | `DCM` | `(T, d)` | Dimension contributions passed to IndepNDCG and aVUSi |

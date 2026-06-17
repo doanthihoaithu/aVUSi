@@ -71,6 +71,37 @@ Dimension-wise labels `DL` are essential for computing `IndepNDCG` and `aVUSi`, 
 
 ---
 
+## Folder Structure
+
+```
+1_synthetic_data_generator/
+├── README.md
+├── data/
+│   └── <config_name>/              # one folder per configuration (e.g. settings_six)
+│       ├── synthetic_training.csv  # anomaly-free training time series (X, L, DL)
+│       ├── synthetic_0.csv         # test batch 0 (X, L, DL)
+│       ├── synthetic_1.csv         # test batch 1
+│       ├── ...
+│       └── figures/                # per-batch visualisation plots
+│           ├── synthetic_training.png
+│           ├── batch_0.png
+│           └── ...
+└── zip/
+    └── <config_name>/              # compressed counterparts of data/
+        ├── synthetic_training.csv.zip
+        ├── synthetic_0.csv.zip
+        └── ...
+```
+
+Each CSV file contains:
+- `Sensor_*` columns — the raw multivariate time series (`X`)
+- `is_anomaly` column — univariate anomaly label (`L`)
+- `AnomalyFlag_*` columns — dimension-wise anomaly labels (`DL`)
+
+The `zip/` directory mirrors `data/` and is consumed directly by **Module 2** (`process_synthetic_data_for_running_mts_detectors.py`).
+
+---
+
 
 ## Dataset
 

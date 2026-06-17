@@ -421,7 +421,7 @@ The plot shows:
 
 ---
 
-### 4. Plot all figures in the paper
+## Plot all figures in the paper
 
 Please refer to [`reproduce_results/plot_figures_in_the_paper.ipynb`](reproduce_results/plot_figures_in_the_paper.ipynb) for the complete code to reproduce all figures in the paper, including the main evaluation results on the synthetic and SMD datasets.
 

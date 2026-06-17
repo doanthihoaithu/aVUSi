@@ -1,0 +1,152 @@
+hydra:
+  job:
+    chdir: true  # to save objects in a working directory
+  run:
+    dir: ./hydra_outputs  # Disable Hydra's Directory Change
+random_state: 42
+
+
+datasets:
+  settings_six:
+    n_sensors: 10
+  settings_five:
+    n_sensors: 10
+  smd:
+    n_sensors: 38
+
+mts_running_dataset: settings_five
+
+current_n_dimensions: ${datasets.${mts_running_dataset}.n_sensors}
+mts_supported_detectors: ['cblof', 'auto_encoder', 'copod', 'denoising_auto_encoder', 'encdec_ad', 'hbos', 'omni_anomaly', 'random_black_forest', 'tran_ad' , 'mtad_gat']
+
+executionType: 'all' # 'train' or 'test' or 'all'
+ #['hbos','cblof', 'copod', 'auto_encoder', 'denoising_auto_encoder', 'encdec_ad']
+#['random_black_forest', 'omni_anomaly', 'tran_ad' , 'mtad_gat']
+mts_running_detector: 'tran_ad'
+mts_current_custom_parameters: ${customParameters.${mts_running_detector}}
+data_folder: data/mts/${mts_running_dataset}
+scaler_folder: ${data_folder}/scaler
+
+results_path: results/${mts_running_dataset}/merged_results/${mts_running_detector}
+results_zip_path: results_zip/${mts_running_dataset}/${mts_running_detector}
+results_merged_path: results_zip/${mts_running_dataset}/${mts_running_detector}/newest_results_merged
+unsupervised_custom_datasets_file: ${data_folder}/unsupervised/datasets.json
+semisupervised_custom_datasets_file: ${data_folder}/semisupervised/datasets_merged.json
+
+dataInput: ${data_folder}
+dataOutput: ${results_path}
+modelInputDir: ${results_path}
+modelOutputDir: ${results_path}
+modelInputFile: ${modelInputDir}/model.pkl
+modelOutputFile: ${modelOutputDir}/model.pkl
+runtimeOutput: None
+
+#merge_results:
+#  mts_running_dataset: settings_five
+#  data_folder: data/mts/${mts_running_dataset}
+#  results_path: results/${mts_running_dataset}/merged_results
+
+customParameters:
+  hbos:
+    random_state: ${random_state}
+    n_bins: 10
+    alpha: 0.1
+    bin_tol: 0.5
+    contamination: -0.1
+  auto_encoder:
+    latent_size: 32
+    epochs: 100
+    learning_rate: 0.001
+#    early_stopping_delta: 1e-2
+    early_stopping_patience: 10
+    split: 0.8
+    retrain: True
+  denoising_auto_encoder:
+    latent_size: 32
+    epochs: 100
+    learning_rate: 0.001
+    noise_ratio: 0.1
+    early_stopping_patience:  10
+#    early_stopping_delta: 1e-2
+    split: 0.8
+    retrain: True
+  cblof:
+    n_clusters: 10
+    alpha: 0.9
+    beta: 5
+    use_weights: False
+    random_state: ${random_state}
+    n_jobs: 4
+  copod:
+    random_state: ${random_state}
+    n_jobs: 1
+  encdec_ad:
+    random_state: ${random_state}
+    input_size: ${datasets.${mts_running_dataset}.n_sensors}
+    lstm_layers:  1
+    split: 0.8
+    anomaly_window_size: 30
+    latent_size: 40
+    batch_size: 32
+    validation_batch_size:  64
+    test_batch_size: 64
+    epochs: 50  # bigger for smaller datasets, smaller for bigger datasets
+    early_stopping_delta: 0.05
+    early_stopping_patience: 10
+    learning_rate: 1e-3
+    retrain: True
+  random_black_forest:
+    train_window_size: 50
+    n_estimators: 2  # number of forests
+    max_features_per_estimator: 0.5  # fraction of features per forest
+    n_trees: 100  # number of trees per forest
+    max_features_method: "sqrt"  # "sqrt", "log2"
+    bootstrap: True
+#    max_samples: null  # fraction of all samples
+    # standardize: bool = False  # does not really influence the quality
+    random_state: ${random_state}
+    verbose: 0
+    n_jobs: 1
+    # the following parameters control the tree size
+#    max_depth: None
+    min_samples_split: 2
+    min_samples_leaf: 1
+    retrain: True
+  tran_ad:
+    model: 'tran_ad'
+    dataset: ${mts_running_dataset}
+    random_state: ${random_state}
+    n_feats: ${datasets.${mts_running_dataset}.n_sensors}
+    epochs: 50
+    n_window: 30
+    retrain: True
+  omni_anomaly:
+    model: 'omni_anomaly'
+    dataset: ${mts_running_dataset}
+    random_state: ${random_state}
+    n_feats: ${datasets.${mts_running_dataset}.n_sensors}
+    epochs: 10
+    n_window: 30
+    retrain: True
+  mtad_gat:
+    model: 'mtad_gat'
+    dataset: ${mts_running_dataset}
+    random_state: ${random_state}
+    n_feats: ${datasets.${mts_running_dataset}.n_sensors}
+    epochs: 30
+    n_window: 30
+    retrain: True
+    batch_size: 64
+
+# For displaying in result dfs
+name_mapping:
+  hbos: 'HBOS'
+  auto_encoder: 'AutoEncoder (AE)'
+  denoising_auto_encoder: 'DenoisingAutoEncoder (DAE)'
+  cblof: 'CBLOF'
+  copod: 'COPOD'
+  encdec_ad: 'EncDec-AD'
+  random_black_forest: 'Random Black Forest (RR)'
+  tran_ad: 'TranAD'
+  omni_anomaly: 'OmniAnomaly'
+  mtad_gat: 'MTAD-GAT'
