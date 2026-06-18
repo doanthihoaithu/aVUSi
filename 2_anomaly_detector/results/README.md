@@ -32,6 +32,16 @@ results/
 
 The two files consumed by **Module 3** are `anomaly-scores.csv` (`S`) and `docker-algorithm-dimension-contribution.csv` (`DCM`).
 
+## Pre-computed Results (Paper)
+
+Ready-to-use results for the two datasets evaluated in the paper are available on Google Drive:
+
+**[Download from Google Drive](https://drive.google.com/drive/folders/1PNxYpqO3lYkuagxe7IxynApdTjJLvudw?usp=sharing)**
+
+Each dataset folder contains `anomaly-scores.csv` (`S`) and `docker-algorithm-dimension-contribution.csv` (`DCM`) for all 10 individual detectors (HBOS, RBF, CBLOF, COPOD, AE, DAE, EncDec-AD, TranAD, OmniAnomaly, MTAD-GAT) and the Average Ensemble (`avg_ens`).
+
+Download the corresponding folder and place its contents under `results/<dataset_name>/`.
+
 ## How to Generate
 
 ```bash
