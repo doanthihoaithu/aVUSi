@@ -139,7 +139,7 @@ The two most commonly changed fields are:
 
 | Field | Description | Example values |
 |---|---|---|
-| `mts_running_dataset` | Dataset to run detectors on | `settings_six`, `settings_five`, `smd` |
+| `mts_running_dataset` | Dataset to run detectors on | [`settings_six`](https://github.com/doanthihoaithu/synthsensor/blob/master/Python/generation/config/settings_six.yaml), `settings_five`, `smd` |
 | `mts_running_detector` | Detector to run | `hbos`, `tran_ad`, `auto_encoder`, `cblof`, `copod`, `denoising_auto_encoder`, `encdec_ad`, `random_black_forest`, `omni_anomaly`, `mtad_gat` |
 | `executionType` | Execution mode | `all`, `train`, `test` |
 

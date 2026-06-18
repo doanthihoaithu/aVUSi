@@ -19,6 +19,7 @@ STEP 1 — Generate synthetic data  (Module 1)
 
   Run the extended synthsensor generator with a YAML configuration.
   Paper config: settings_six.yaml (10 sensors, 974 subsets)
+               https://github.com/doanthihoaithu/synthsensor/blob/master/Python/generation/config/settings_six.yaml
   Repo: https://github.com/doanthihoaithu/synthsensor
 
   Output

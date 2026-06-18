@@ -38,6 +38,11 @@ Ready-to-use results for the two datasets evaluated in the paper are available o
 
 **[Download from Google Drive](https://drive.google.com/drive/folders/1PNxYpqO3lYkuagxe7IxynApdTjJLvudw?usp=sharing)**
 
+| Dataset | Description |
+|---|---|
+| `settings_six` | Synthetic MTS benchmark — generated with [`settings_six.yaml`](https://github.com/doanthihoaithu/synthsensor/blob/master/Python/generation/config/settings_six.yaml) (10 sensors, 974 batches) |
+| `SMD` | Server Machine Dataset — real-world MTS benchmark |
+
 Each dataset folder contains `anomaly-scores.csv` (`S`) and `docker-algorithm-dimension-contribution.csv` (`DCM`) for all 10 individual detectors (HBOS, RBF, CBLOF, COPOD, AE, DAE, EncDec-AD, TranAD, OmniAnomaly, MTAD-GAT) and the Average Ensemble (`avg_ens`).
 
 Download the corresponding folder and place its contents under `results/<dataset_name>/`.
