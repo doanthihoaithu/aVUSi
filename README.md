@@ -439,4 +439,4 @@ Python scripts for plotting individual figures are also provided in the same dir
 
 ## Contact
 
-- Thu T. H. Doan — thihoaithu.doan@gssi.it
+- Thu T. H. Doan — thihoaithu.doan@gssi.it (Gran Sasso Science Institute - GSSI)
